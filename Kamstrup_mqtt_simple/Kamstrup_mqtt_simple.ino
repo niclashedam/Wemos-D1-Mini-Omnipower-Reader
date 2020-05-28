@@ -2,20 +2,27 @@
 #include <PubSubClient.h>
 #include "gcm.h"
 #include "mbusparser.h"
+#include <SoftwareSerial.h>
 
 #define DEBUG_BEGIN Serial.begin(115200);
 #define DEBUG_PRINT(x) Serial.print(x);sendmsg(String(mqtt_topic)+"/status",x);
 #define DEBUG_PRINTLN(x) Serial.println(x);sendmsg(String(mqtt_topic)+"/status",x);
 
-const char* ssid = "******";
-const char* password =  "******";
-const char* mqttServer = "******";
+// Software serial configs
+#define D5 (14)
+#define D6 (12)
+#define BAUD_RATE 2400
+SoftwareSerial swSer;
+
+const char* ssid = "xxxxxxxxx";
+const char* password =  "xxxxxxxxx";
+const char* mqttServer = "xxxxxxxxx";
 const int mqttPort = 1883;
-const char* mqttUser = "******";
-const char* mqttPassword = "******";
+const char* mqttUser = "xxxxxxxxx";
+const char* mqttPassword = "xxxxxxxxx";
 char mqtt_topic[40] = "kamstrup";
-char conf_key[33] = "******";
-char conf_authkey[33] = "******";
+char conf_key[33] = "xxxxxxxxx";
+char conf_authkey[33] = "xxxxxxxxx";
 
 const size_t headersize = 11;
 const size_t footersize = 3;
@@ -33,12 +40,15 @@ PubSubClient client(espClient);
 void setup() {
   DEBUG_BEGIN
   DEBUG_PRINTLN("")
-  //Serial.begin(115200);
+  pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
 
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(400);
     Serial.println("Connecting to WiFi..");
   }
   Serial.println("Connected to the WiFi network");
@@ -60,9 +70,8 @@ void setup() {
 
     }
   }
-
-  Serial.begin(2400, SERIAL_8N1);
-  Serial.swap();
+  Serial.println("Initiating SoftwareSerial on RX=D5");
+  swSer.begin(BAUD_RATE, SWSERIAL_8N1, D5, D6, false, 95, 11);
   hexStr2bArr(encryption_key, conf_key, sizeof(encryption_key));
   hexStr2bArr(authentication_key, conf_authkey, sizeof(authentication_key));
   Serial.println("Setup completed");
@@ -70,9 +79,9 @@ void setup() {
 }
 
 void loop() {
-  while (Serial.available() > 0) {
+  while (swSer.available() > 0) {
     //for(int i=0;i<sizeof(input);i++){
-    if (streamParser.pushData(Serial.read())) {
+    if (streamParser.pushData(swSer.read())) {
       //  if (streamParser.pushData(input[i])) {
       VectorView frame = streamParser.getFrame();
       if (streamParser.getContentType() == MbusStreamParser::COMPLETE_FRAME) {
@@ -92,6 +101,7 @@ void loop() {
 
 
 void sendData(MeterData md) {
+  Serial.println("Sending");
   if (md.activePowerPlusValid)
     sendmsg(String(mqtt_topic) + "/power/activePowerPlus", String(md.activePowerPlus));
   if (md.activePowerMinusValid)
