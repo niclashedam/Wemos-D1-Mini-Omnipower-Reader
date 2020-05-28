@@ -8,7 +8,7 @@ Here's what we do:
 - Decrypt the incoming data using the two keys you got from Radius (Copenhagen-area DSO), 
 - Publish the data to a MQTT broker of your choice.
 
-__Note: You need to write to (kundesupport@radiuselnet.dk)[mailto:kundesupport@radiuselnet.dk] to get your decryption keys__
+__Note: You need to write to [kundesupport@radiuselnet.dk](mailto:kundesupport@radiuselnet.dk) to get your decryption keys__
 
 ### Hookup guide:
 
