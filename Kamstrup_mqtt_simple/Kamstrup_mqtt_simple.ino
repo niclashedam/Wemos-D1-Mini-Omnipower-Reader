@@ -5,8 +5,8 @@
 #include <SoftwareSerial.h>
 
 #define DEBUG_BEGIN Serial.begin(115200);
-#define DEBUG_PRINT(x) Serial.print(x);sendmsg(String(mqtt_topic)+"/status",x);
-#define DEBUG_PRINTLN(x) Serial.println(x);sendmsg(String(mqtt_topic)+"/status",x);
+#define DEBUG_PRINT(x) Serial.print(x);
+#define DEBUG_PRINTLN(x) Serial.println(x);
 
 // Software serial configs
 #define D5 (14)
@@ -14,15 +14,15 @@
 #define BAUD_RATE 2400
 SoftwareSerial swSer;
 
-const char* ssid = "xxxxxxxxx";
-const char* password =  "xxxxxxxxx";
-const char* mqttServer = "xxxxxxxxx";
+const char* ssid = "******";
+const char* password =  "******";
+const char* mqttServer = "******";
 const int mqttPort = 1883;
-const char* mqttUser = "xxxxxxxxx";
-const char* mqttPassword = "xxxxxxxxx";
+const char* mqttUser = "******";
+const char* mqttPassword = "******";
 char mqtt_topic[40] = "kamstrup";
-char conf_key[33] = "xxxxxxxxx";
-char conf_authkey[33] = "xxxxxxxxx";
+char conf_key[33] = "******";
+char conf_authkey[33] = "******";
 
 const size_t headersize = 11;
 const size_t footersize = 3;
@@ -89,9 +89,11 @@ void loop() {
         if (!decrypt(frame))
         {
           DEBUG_PRINTLN("Decryption failed");
+          sendmsg(String(mqtt_topic)+"/decryption_failed","0");
           return;
         }
         MeterData md = parseMbusFrame(decryptedFrame);
+        sendmsg(String(mqtt_topic)+"/decryption_failed","0");
         sendData(md);
       }
     }
