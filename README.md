@@ -12,10 +12,10 @@ __Note: You need to write to [kundesupport@radiuselnet.dk](mailto:kundesupport@r
 
 ### Hookup guide:
 
-1. Modify the code with your WiFi, MQTT, and Key information
-2. Upload modified sketch to Wemos
-2. Connect: Wemos Ground pin <-> Kamstrup HAN slot top left pin
-2. Connect: Wemos D5 pin <-> Kamstrup HAN slot top middle pin
+1. Rename `secrets.h.TEMPLATE` to `secrets.h` and insert your WiFi, MQTT, and Key information
+2. Upload sketch to Wemos
+2. Connect pin: Wemos `G` pin <-> Kamstrup HAN slot top left pin
+2. Connect pin: Wemos `D5` pin <-> Kamstrup HAN slot top middle pin
 3. Power the Wemos through USB charger
 4. Subscripe to your MQTT broker and do what ever you want with it
 
