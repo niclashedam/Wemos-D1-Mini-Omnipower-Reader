@@ -2,6 +2,7 @@
 #include <PubSubClient.h>
 #include "gcm.h"
 #include "mbusparser.h"
+#include "secrets.h" // <-- create this file using "secrets.h.TEMPLATE"
 #include <SoftwareSerial.h>
 
 #define DEBUG_BEGIN Serial.begin(115200);
@@ -13,16 +14,6 @@
 #define D6 (12)
 #define BAUD_RATE 2400
 SoftwareSerial swSer;
-
-const char* ssid = "******";
-const char* password =  "******";
-const char* mqttServer = "******";
-const int mqttPort = 1883;
-const char* mqttUser = "******";
-const char* mqttPassword = "******";
-char mqtt_topic[40] = "kamstrup";
-char conf_key[33] = "******";
-char conf_authkey[33] = "******";
 
 const size_t headersize = 11;
 const size_t footersize = 3;
