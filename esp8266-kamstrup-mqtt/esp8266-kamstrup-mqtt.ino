@@ -80,7 +80,7 @@ void loop() {
         if (!decrypt(frame))
         {
           DEBUG_PRINTLN("Decryption failed");
-          sendmsg(String(mqtt_topic)+"/decryption_failed","0");
+          sendmsg(String(mqtt_topic)+"/decryption_failed","1");
           return;
         }
         MeterData md = parseMbusFrame(decryptedFrame);
