@@ -238,7 +238,11 @@ void hexStr2bArr(uint8_t* dest, const char* source, int bytes_n)
 
 
 void sendmsg(String topic, String payload) {
-  if (client.connected()) {
+  if (client.connected() && WiFi.status() == WL_CONNECTED) {
+    // If we are connected to WiFi and MQTT, send.
     client.publish(topic.c_str(), payload.c_str());    
+  } else {
+    // Otherwise, restart the chip, hoping that the issue resolved itself.
+    ESP.restart();
   }
 }
