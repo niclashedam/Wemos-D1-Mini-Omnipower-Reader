@@ -43,6 +43,7 @@ void setup() {
     Serial.println("Connecting to WiFi..");
   }
   Serial.println("Connected to the WiFi network");
+  digitalWrite(LED_BUILTIN, LOW);
 
   client.setServer(mqttServer, mqttPort);
   
@@ -66,7 +67,13 @@ void setup() {
   hexStr2bArr(encryption_key, conf_key, sizeof(encryption_key));
   hexStr2bArr(authentication_key, conf_authkey, sizeof(authentication_key));
   Serial.println("Setup completed");
-
+  // Fast blink to indicate that setup was successful
+  for(int i=0;i<10;i++){
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(50);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(100);
+  }
 }
 
 void loop() {
@@ -81,11 +88,11 @@ void loop() {
         {
           DEBUG_PRINTLN("Decryption failed");
           sendmsg(String(mqtt_topic)+"/decryption_failed","1");
-          return;
+        } else {
+          MeterData md = parseMbusFrame(decryptedFrame);
+          sendmsg(String(mqtt_topic)+"/decryption_failed","0");
+          sendData(md);
         }
-        MeterData md = parseMbusFrame(decryptedFrame);
-        sendmsg(String(mqtt_topic)+"/decryption_failed","0");
-        sendData(md);
       }
     }
   }
@@ -238,7 +245,14 @@ void hexStr2bArr(uint8_t* dest, const char* source, int bytes_n)
 
 
 void sendmsg(String topic, String payload) {
-  if (client.connected()) {
-    client.publish(topic.c_str(), payload.c_str());    
+  if (client.connected() && WiFi.status() == WL_CONNECTED) {
+    // If we are connected to WiFi and MQTT, send.
+    digitalWrite(LED_BUILTIN, LOW);
+    client.publish(topic.c_str(), payload.c_str());
+    delay(100);
+    digitalWrite(LED_BUILTIN, HIGH);    
+  } else {
+    // Otherwise, restart the chip, hoping that the issue resolved itself.
+    ESP.restart();
   }
 }
